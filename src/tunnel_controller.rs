@@ -20,25 +20,28 @@ pub struct Tunnel {
 pub struct TunnelConfig {
     local_port: u16,
     remote_host: String,
+    remote_name: String
 }
 
 impl TunnelConfig {
-    pub fn new(port: u16, remote_host: String) -> Self {
+    pub fn new(port: u16, remote_host: String, remote_name: String) -> Self {
         TunnelConfig {
             local_port: port,
-            remote_host: remote_host
+            remote_host: remote_host,
+            remote_name: remote_name
         }
     }
 
     /// Describes how to spawn the ngrok process
     pub fn spawn(&self) -> Result<Child> {
         self.write_config_file();
-        Command::new("ngrok")
+        Command::new("./ngrok")
                 // Important! By default ngrok has a curses like view
                 // which takes over terminal, setting log overrides that
                 .arg("-log=stdout")
                 .arg("-config")
                 .arg("ngrok_config.yaml")
+                .arg(format!("-subdomain={}", self.remote_name))
                 .arg(self.local_port.to_string())
                 .spawn()
     }

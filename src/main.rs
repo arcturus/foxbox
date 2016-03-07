@@ -82,7 +82,7 @@ use std::mem;
 use std::sync::atomic::{ AtomicBool, Ordering, ATOMIC_BOOL_INIT };
 
 docopt!(Args derive Debug, "
-Usage: foxbox [-v] [-h] [-n <hostname>] [-p <port>] [-w <wsport>] [-r <url>] [-i <iface>] [-t <tunnel>]
+Usage: foxbox [-v] [-h] [-n <hostname>] [-p <port>] [-w <wsport>] [-r <url>] [-i <iface>] [-t <tunnel>] [-x <tname>]
 
 Options:
     -v, --verbose            Toggle verbose output.
@@ -92,6 +92,7 @@ Options:
     -r, --register <url>     Change the url of the registration endpoint. [default: http://localhost:4242/register]
     -i, --iface <iface>      Specify the local IP interface.
     -t, --tunnel <tunnel>    Set the tunnel endpoint's hostname. If omitted, the tunnel is disabled.
+    -x, --tname <tname>      Set the tunnel's public name.
     -h, --help               Print this help menu.
 ",
         flag_name: Option<String>,
@@ -99,7 +100,8 @@ Options:
         flag_wsport: u16,
         flag_register: String,
         flag_iface: Option<String>,
-        flag_tunnel: Option<String>);
+        flag_tunnel: Option<String>,
+        flag_tname: Option<String>);
 
 /// Updates local host name with the provided host name string. If requested host name
 /// is not available (used by anyone else on the same network) then collision
@@ -147,7 +149,7 @@ fn main() {
     // Start the tunnel.
     let mut tunnel: Option<Tunnel> = None;
     if let Some(host) = args.flag_tunnel {
-        tunnel = Some(Tunnel::new(TunnelConfig::new(args.flag_port, host)));
+        tunnel = Some(Tunnel::new(TunnelConfig::new(args.flag_port, host, args.flag_tname.unwrap())));
         tunnel.as_mut().unwrap().start().unwrap();
     }
 
