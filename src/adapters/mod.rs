@@ -8,6 +8,9 @@ pub mod clock;
 /// An adapter displaying messages on the console.
 pub mod console;
 
+/// Adapter for testing api
+pub mod ping;
+
 /// A Text To Speak adapter
 #[cfg(target_os = "linux")]
 pub mod tts;
@@ -118,6 +121,7 @@ impl<T: Controller> AdapterManager<T> {
     pub fn start(&mut self, manager: &Arc<TaxoManager>) {
         console::Console::init(manager).unwrap(); // FIXME: We should have a way to report errors
         clock::Clock::init(manager).unwrap(); // FIXME: We should have a way to report errors
+        ping::PingPong::init(manager).unwrap();
 
         self.start_webpush(manager);
         self.start_ip_camera(manager);
